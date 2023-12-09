@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  aerospike:
+    image: aerospike/aerospike-server-enterprise:6.4.0.10
+    ports:
+      - "3000:3000"  # Aerospike service port
+      - "3001:3001"  # Aerospike fabric port
+      - "3002:3002"  # Aerospike heartbeat port
+      - "3003:3003"  # Aerospike info port
+
+  prometheus:
+    image: prom/prometheus:v2.48.1
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus:/etc/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+
+  aerospike_exporter:
+    image: aerospike/aerospike-prometheus-exporter:1.14.0
+    ports:
+      - "9145:9145"
+    environment:
+      - AS_HOST=aerospike
+      - AS_PORT=3000
